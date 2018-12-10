@@ -78,7 +78,7 @@ namespace graphs {
             this.functionType = FunctionType.Polar;
             this.computatableFunction = computatableFunction;
             this.bounds = bounds ? bounds : [0, Math.PI * 2];
-            this.int = Math.PI / 12;
+            this.int = Math.PI / 36;
             this.color = color;
         }
 

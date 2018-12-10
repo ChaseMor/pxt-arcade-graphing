@@ -9,10 +9,10 @@ namespace graphs {
 
     export class Graph {
 
-        xMin: number = -10;
-        xMax: number = 10;
-        yMin: number = -10;
-        yMax: number = 10;
+        xMin: number = -8;
+        xMax: number = 8;
+        yMin: number = -6;
+        yMax: number = 6;
 
         functions: GraphableFunction[];
 
@@ -77,8 +77,8 @@ namespace graphs {
                             screen.drawLine(this.getScreenX(temp[0]), this.getScreenY(temp[1]),
                                 this.getScreenX(last[0]), this.getScreenY(last[1]), f.color);
                         }
-                        last = temp;
                     }
+                    last = temp;
                 }
             }
         }
