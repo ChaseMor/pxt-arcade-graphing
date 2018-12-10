@@ -8,7 +8,8 @@
     "files": [
         "README.md",
         "main.ts",
-        "functiontypes.ts"
+        "functiontypes.ts",
+        "graph.ts"
     ],
     "testFiles": [
         "test.ts"
