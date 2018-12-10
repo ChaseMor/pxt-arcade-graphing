@@ -69,9 +69,9 @@ namespace graphs {
                         interval = f.int;
                         break;
                 }
-                for (let p: number = bounds[0]; p < bounds[1]; p += interval) {
+                for (let p: number = bounds[0]; p <= bounds[1]; p += interval) {
                     let temp = f.compute(p);
-                    if ((temp[0] >= this.yMin) && (temp[0] <= this.yMax)
+                    if ((temp[0] >= this.xMin) && (temp[0] <= this.xMax)
                         && (temp[1] >= this.yMin) && (temp[1] <= this.yMax)) {
                         if (last) {
                             screen.drawLine(this.getScreenX(temp[0]), this.getScreenY(temp[1]),
