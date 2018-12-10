@@ -3,11 +3,13 @@ namespace graphs {
         functionType: FunctionType;
         compute(param: number): number[];
         int: number;
+        bounds: number[];
     }
 
     export class XBasedFunction implements GraphableFunction {
         functionType: FunctionType;
         int: number;
+        bounds: number[];
 
         computatableFunction: (x: number) => number;
 
@@ -24,6 +26,7 @@ namespace graphs {
     export class YBasedFunction implements GraphableFunction {
         functionType: FunctionType;
         int: number;
+        bounds: number[];
 
         computatableFunction: (y: number) => number;
 
@@ -40,12 +43,14 @@ namespace graphs {
     export class ParametricFunction implements GraphableFunction {
         functionType: FunctionType;
         int: number;
+        bounds: number[];
 
         computatableFunction: (t: number) => number[];
 
-        constructor(computatableFunction: (t: number) => number[]) {
+        constructor(computatableFunction: (t: number) => number[], bounds?: number[]) {
             this.functionType = FunctionType.Parametric;
             this.computatableFunction = computatableFunction;
+            this.bounds = bounds ? bounds : [0, 10];
         }
 
         compute(t: number): number[] {
@@ -56,12 +61,14 @@ namespace graphs {
     export class PolarFunction implements GraphableFunction {
         functionType: FunctionType;
         int: number;
+        bounds: number[];
 
         computatableFunction: (theta: number) => number;
 
-        constructor(computatableFunction: (theta: number) => number) {
+        constructor(computatableFunction: (theta: number) => number, bounds?: number[]) {
             this.functionType = FunctionType.XBased;
             this.computatableFunction = computatableFunction;
+            this.bounds = bounds ? bounds : [0, Math.PI * 2];
         }
 
         compute(theta: number): number[] {

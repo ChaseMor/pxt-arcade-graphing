@@ -47,21 +47,37 @@ namespace graphs {
 
         drawFunctions() {
             for (let f of this.functions) {
+                let last: number[] = undefined;
+                let bounds: number[];
+                let interval: number;
                 switch (f.functionType) {
                     case FunctionType.XBased:
-                        let last: number[] = undefined;
-                        for (let x: number = this.xMin; x < this.xMax; x += f.int ? f.int : (this.xMax - this.xMin) / screen.width) {
-                            let temp = f.compute(x);
-                            if ((temp[0] >= this.yMin) && (temp[0] <= this.yMax) 
-                                    && (temp[1] >= this.yMin) && (temp[1] <= this.yMax)) {
-                                if (last) {
-                                    screen.drawLine(this.getScreenX(temp[0]), this.getScreenY(temp[1]), 
-                                            this.getScreenX(last[0]), this.getScreenY(last[1]), 1);
-                                }
-                                last = temp;
-                            }
-                        }
+                        bounds = [this.xMin, this.xMax];
+                        interval = (this.xMax - this.xMin) / screen.width;
                         break;
+                    case FunctionType.YBased:
+                        bounds = [this.yMin, this.yMax];
+                        interval = (this.yMax - this.yMin) / screen.height;
+                        break;
+                    case FunctionType.Parametric:
+                        bounds = f.bounds;
+                        interval = f.int;
+                        break;
+                    case FunctionType.Polar:
+                        bounds = f.bounds;
+                        interval = f.int;
+                        break;
+                }
+                for (let p: number = bounds[0]; p < bounds[1]; p += f.int ? f.int : (this.xMax - this.xMin) / screen.width) {
+                    let temp = f.compute(p);
+                    if ((temp[0] >= this.yMin) && (temp[0] <= this.yMax)
+                        && (temp[1] >= this.yMin) && (temp[1] <= this.yMax)) {
+                        if (last) {
+                            screen.drawLine(this.getScreenX(temp[0]), this.getScreenY(temp[1]),
+                                this.getScreenX(last[0]), this.getScreenY(last[1]), 1);
+                        }
+                        last = temp;
+                    }
                 }
             }
         }
@@ -95,5 +111,5 @@ namespace graphs {
 
     }
     let g: Graph = new Graph();
-    g.addXBasedFunction(function (x: number) { return x ** 3; });
+    g.addXBasedFunction(function (x: number) { return 5 * Math.sin(x); });
 }
