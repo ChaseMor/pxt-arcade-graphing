@@ -69,7 +69,7 @@ namespace graphs {
                         interval = f.int;
                         break;
                 }
-                for (let p: number = bounds[0]; p < bounds[1]; p += f.int ? f.int : (this.xMax - this.xMin) / screen.width) {
+                for (let p: number = bounds[0]; p < bounds[1]; p += interval) {
                     let temp = f.compute(p);
                     if ((temp[0] >= this.yMin) && (temp[0] <= this.yMax)
                         && (temp[1] >= this.yMin) && (temp[1] <= this.yMax)) {
@@ -98,7 +98,6 @@ namespace graphs {
             if (x > this.xMax || x < this.xMin) {
                 return undefined;
             }
-
             return (screen.width / (this.xMax - this.xMin)) * (x - this.xMin);
         }
 
@@ -106,7 +105,6 @@ namespace graphs {
             if (y > this.yMax || y < this.yMin) {
                 return undefined;
             }
-
             return screen.height - (screen.height / (this.yMax - this.yMin)) * (y - this.yMin);
         }
 

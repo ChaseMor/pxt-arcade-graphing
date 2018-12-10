@@ -3,4 +3,8 @@ namespace graphs {
     g.addXBasedFunction(function (x: number) {
         return 5 * Math.sin(x);
     }, 8);
+
+    g.addPolarFunction(function (theta: number) {
+        return 0.5 * (theta);
+    }, 7, [0, Math.PI * 5]);
 }

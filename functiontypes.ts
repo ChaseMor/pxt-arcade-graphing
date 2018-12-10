@@ -57,6 +57,7 @@ namespace graphs {
             this.functionType = FunctionType.Parametric;
             this.computatableFunction = computatableFunction;
             this.bounds = bounds ? bounds : [0, 10];
+            this.int = (this.bounds[1] - this.bounds[0]) / 100;
             this.color = color;
         }
 
@@ -74,9 +75,10 @@ namespace graphs {
         computatableFunction: (theta: number) => number;
 
         constructor(computatableFunction: (theta: number) => number, color: number, bounds?: number[]) {
-            this.functionType = FunctionType.XBased;
+            this.functionType = FunctionType.Polar;
             this.computatableFunction = computatableFunction;
             this.bounds = bounds ? bounds : [0, Math.PI * 2];
+            this.int = (this.bounds[1] - this.bounds[0]) / 100;
             this.color = color;
         }
 
