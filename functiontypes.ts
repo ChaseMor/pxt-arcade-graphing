@@ -4,18 +4,21 @@ namespace graphs {
         compute(param: number): number[];
         int: number;
         bounds: number[];
+        color: number;
     }
 
     export class XBasedFunction implements GraphableFunction {
         functionType: FunctionType;
         int: number;
         bounds: number[];
+        color: number;
 
         computatableFunction: (x: number) => number;
 
-        constructor(computatableFunction: (x: number) => number) {
+        constructor(computatableFunction: (x: number) => number, color: number) {
             this.functionType = FunctionType.XBased;
             this.computatableFunction = computatableFunction;
+            this.color = color;
         }
 
         compute(x: number): number[] {
@@ -27,12 +30,14 @@ namespace graphs {
         functionType: FunctionType;
         int: number;
         bounds: number[];
+        color: number;
 
         computatableFunction: (y: number) => number;
 
-        constructor(computatableFunction: (y: number) => number) {
+        constructor(computatableFunction: (y: number) => number, color: number) {
             this.functionType = FunctionType.YBased;
             this.computatableFunction = computatableFunction;
+            this.color = color;
         }
 
         compute(y: number): number[] {
@@ -44,13 +49,15 @@ namespace graphs {
         functionType: FunctionType;
         int: number;
         bounds: number[];
+        color: number;
 
         computatableFunction: (t: number) => number[];
 
-        constructor(computatableFunction: (t: number) => number[], bounds?: number[]) {
+        constructor(computatableFunction: (t: number) => number[], color: number, bounds?: number[]) {
             this.functionType = FunctionType.Parametric;
             this.computatableFunction = computatableFunction;
             this.bounds = bounds ? bounds : [0, 10];
+            this.color = color;
         }
 
         compute(t: number): number[] {
@@ -62,13 +69,15 @@ namespace graphs {
         functionType: FunctionType;
         int: number;
         bounds: number[];
+        color: number;
 
         computatableFunction: (theta: number) => number;
 
-        constructor(computatableFunction: (theta: number) => number, bounds?: number[]) {
+        constructor(computatableFunction: (theta: number) => number, color: number, bounds?: number[]) {
             this.functionType = FunctionType.XBased;
             this.computatableFunction = computatableFunction;
             this.bounds = bounds ? bounds : [0, Math.PI * 2];
+            this.color = color;
         }
 
         compute(theta: number): number[] {

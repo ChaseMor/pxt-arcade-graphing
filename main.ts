@@ -23,20 +23,20 @@ namespace graphs {
 
         }
 
-        addXBasedFunction(eq: (x: number) => number) {
-            this.functions.push(new XBasedFunction(eq));
+        addXBasedFunction(eq: (x: number) => number, color: number) {
+            this.functions.push(new XBasedFunction(eq, color));
         }
 
-        addYBasedFunction(eq: (y: number) => number) {
-            this.functions.push(new YBasedFunction(eq));
+        addYBasedFunction(eq: (y: number) => number, color: number) {
+            this.functions.push(new YBasedFunction(eq, color));
         }
 
-        addParametricFunction(eq: (t: number) => number[]) {
-            this.functions.push(new ParametricFunction(eq));
+        addParametricFunction(eq: (t: number) => number[], color: number, bounds?: number[]) {
+            this.functions.push(new ParametricFunction(eq, color, bounds));
         }
 
-        addPolarFunction(eq: (theta: number) => number) {
-            this.functions.push(new PolarFunction(eq));
+        addPolarFunction(eq: (theta: number) => number, color: number, bounds?: number[]) {
+            this.functions.push(new PolarFunction(eq, color, bounds));
         }
 
         render() {
@@ -74,7 +74,7 @@ namespace graphs {
                         && (temp[1] >= this.yMin) && (temp[1] <= this.yMax)) {
                         if (last) {
                             screen.drawLine(this.getScreenX(temp[0]), this.getScreenY(temp[1]),
-                                this.getScreenX(last[0]), this.getScreenY(last[1]), 1);
+                                this.getScreenX(last[0]), this.getScreenY(last[1]), f.color);
                         }
                         last = temp;
                     }
@@ -111,5 +111,7 @@ namespace graphs {
 
     }
     let g: Graph = new Graph();
-    g.addXBasedFunction(function (x: number) { return 5 * Math.sin(x); });
+    g.addXBasedFunction(function (x: number) {
+         return 5 * Math.sin(x); 
+    }, 8);
 }
