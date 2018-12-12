@@ -9,7 +9,8 @@
         "README.md",
         "main.ts",
         "functiontypes.ts",
-        "graph.ts"
+        "graph.ts",
+        "data.ts"
     ],
     "testFiles": [
         "test.ts"

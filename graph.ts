@@ -15,13 +15,19 @@ namespace graphs {
         yMax: number = 6;
 
         functions: GraphableFunction[];
+        dataSeq: DataSequence[];
+        dataSets: DataSet[];
+
+        gridVisability: boolean;
 
         constructor() {
             game.currentScene().eventContext.registerFrameHandler(100, () => {
                 this.render();
             });
             this.functions = [];
-
+            this.dataSeq = [];
+            this.dataSets = [];
+            this.gridVisability = true;
         }
 
         addXBasedFunction(eq: (x: number) => number, color: number) {
@@ -42,8 +48,12 @@ namespace graphs {
 
         render() {
             screen.fill(15);
+            this.drawCharts();
+            this.drawDataSets();
             this.drawFunctions();
-            this.drawGrid()
+            if (this.gridVisability) {
+                this.drawGrid()
+            }
         }
 
         drawFunctions() {
@@ -106,6 +116,59 @@ namespace graphs {
                 return undefined;
             }
             return screen.height - (screen.height / (this.yMax - this.yMin)) * (y - this.yMin);
+        }
+
+        chartDataSeq(data: number[], kind: GraphType, color?: number) {
+            this.dataSeq.push(new DataSequence(data, kind, color ? color : 1));
+        }
+
+        plotDataSeq(data: number[], color?: number) {
+            let dataSet: number[][] = [[], []];
+            let width: number = (this.yMax - this.yMin) / data.length;
+            for (let i = 0; i < data.length; i++) {
+                dataSet[0].push(this.yMin + (width / 2) + (i * width));
+                dataSet[1].push(data[i]);
+            }
+            this.plotDataSet(dataSet, 0, 1, color ? color : 1);
+        }
+
+        plotDataSet(data: number[][], x: number, y: number, color?: number) {
+            this.dataSets.push(new DataSet(data, x, y, color ? color : 1))
+        }
+
+        drawCharts() {
+            for (let sequence of this.dataSeq) {
+                let width: number = screen.width / sequence.data.length;
+                switch (sequence.kind) {
+                    case GraphType.Bar:
+                        for (let i = 0; i < sequence.data.length; i++) {
+                            let value: number = sequence.data[i];
+                            screen.fillRect(i * width,
+                                value > 0 ? this.getScreenY(value) : this.getScreenY(0),
+                                width,
+                                value == 0 ? 1 : (screen.height / (this.yMax - this.yMin)) * Math.abs(value),
+                                sequence.color);
+
+                        }
+                        break;
+                    case GraphType.Line:
+                        width = screen.width / (sequence.data.length - 1);
+                        for (let i = 0; i < sequence.data.length - 1; i++) {
+                            let value1: number = sequence.data[i];
+                            let value2: number = sequence.data[i + 1];
+                            screen.drawLine(width * i, this.getScreenY(value1), width * (i + 1), this.getScreenY(value2), sequence.color);
+                        }
+                        break;
+                }
+            }
+        }
+
+        drawDataSets() {
+            for (let dataSet of this.dataSets) {
+                for (let i = 0; i < dataSet.data[0].length; i++) {
+                    screen.setPixel(this.getScreenX(dataSet.data[0][i]), this.getScreenY(dataSet.data[1][i]), dataSet.color);
+                }
+            }
         }
 
     }
