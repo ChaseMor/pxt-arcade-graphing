@@ -73,6 +73,16 @@ namespace display {
         }
 
         private calculateScale() {
+            this.scaleXMax = this.times[0];
+            this.scaleXMin = this.times[0];
+            for (let j = 0, len2 = this.times.length; j < len2; j++) {
+                if (this.scaleXMax < this.times[j]) {
+                    this.scaleXMax = this.times[j];
+                }
+                if (this.scaleXMin > this.times[j]) {
+                    this.scaleXMin = this.times[j];
+                }
+            }
             this.scaleYMax = this.values[0];
             this.scaleYMin = this.values[0];
             for (let j = 0, len2 = this.values.length; j < len2; j++) {
@@ -91,11 +101,11 @@ namespace display {
                 this.scaleYMax = this.scaleYMin + 1; // TODO
 
             // update axis to look better
-            let rx = generateSteps(0, this.times[this.times.length - 1] - this.times[0], 4);
-            //this.scaleXMin = rx[0];
-            //this.scaleXMax = rx[1];
-            this.scaleXMin = this.times[this.times.length - 1];
-            this.scaleXMax = this.times[0];
+            let rx = generateSteps(this.scaleXMin, this.scaleXMax, 4);
+            this.scaleXMin = rx[0];
+            this.scaleXMax = rx[1];
+            // this.scaleXMin = this.times[this.times.length - 1];
+            // this.scaleXMax = this.times[0];
             this.gridCols = rx[2];
             let ry = generateSteps(this.scaleYMin, this.scaleYMax, 6);
             this.scaleYMin = ry[0];
