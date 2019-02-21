@@ -10,6 +10,8 @@ namespace display {
         private gridCols: number;
         private gridWidth: number;
         private gridHeight: number;
+        private xTicks: number;
+        private yTicks: number;
 
         // chart rendering
         private chartWidth: number;
@@ -43,6 +45,9 @@ namespace display {
             this.chartWidth = screen.width - this.axisPaddingX;
             this.chartHeight = screen.height - this.axisPaddingY;
             this.maxEntries = (this.chartWidth - 2);
+
+            this.xTicks = 4;
+            this.yTicks = 6;
         }
 
         public addPoint(value: number) {
@@ -101,13 +106,13 @@ namespace display {
                 this.scaleYMax = this.scaleYMin + 1; // TODO
 
             // update axis to look better
-            let rx = generateSteps(this.scaleXMin, this.scaleXMax, 4);
+            let rx = generateSteps(this.scaleXMin, this.scaleXMax, this.xTicks);
             this.scaleXMin = rx[0];
             this.scaleXMax = rx[1];
             // this.scaleXMin = this.times[this.times.length - 1];
             // this.scaleXMax = this.times[0];
             this.gridCols = rx[2];
-            let ry = generateSteps(this.scaleYMin, this.scaleYMax, 6);
+            let ry = generateSteps(this.scaleYMin, this.scaleYMax, this.yTicks);
             this.scaleYMin = ry[0];
             this.scaleYMax = ry[1];
             this.gridRows = ry[2];
@@ -118,7 +123,7 @@ namespace display {
             const yUnit = yRange / this.gridRows;
             for (let i = 0; i <= this.gridRows; ++i)
                 xl = Math.max(roundWithPrecision(this.scaleYMax - (i * yUnit), 2).toString().length, xl);
-            this.axisPaddingX = xl * this.font.charWidth + 4;
+            this.axisPaddingX = xl * this.font.charWidth + 5;
             this.chartWidth = screen.width - this.axisPaddingX;
             this.maxEntries = (this.chartWidth - 2);
 
@@ -131,15 +136,15 @@ namespace display {
             const c = this.axisColor;
             const tipLength = 3;
 
-            screen.drawRect(0, 0, this.chartWidth, this.chartHeight, c);
+            screen.drawRect(this.axisPaddingX, 0, this.chartWidth, this.chartHeight, c);
 
             for (let i = 0; i < this.gridCols; i++) {
-                screen.drawLine(i * this.gridWidth, this.chartHeight, i * this.gridWidth, this.chartHeight - tipLength, c);
-                screen.drawLine(i * this.gridWidth, 0, i * this.gridWidth, tipLength, c);
+                screen.drawLine(this.axisPaddingX + i * this.gridWidth, this.chartHeight, this.axisPaddingX + i * this.gridWidth, this.chartHeight - tipLength, c);
+                screen.drawLine(this.axisPaddingX + i * this.gridWidth, 0, this.axisPaddingX + i * this.gridWidth, tipLength, c);
             }
             for (let i = 0; i < this.gridRows; i++) {
-                screen.drawLine(0, i * this.gridHeight, tipLength, i * this.gridHeight, c);
-                screen.drawLine(this.chartWidth, i * this.gridHeight, this.chartWidth - tipLength, i * this.gridHeight, c);
+                screen.drawLine(this.axisPaddingX + 0, i * this.gridHeight, this.axisPaddingX + tipLength, i * this.gridHeight, c);
+                screen.drawLine(this.axisPaddingX + this.chartWidth, i * this.gridHeight, this.axisPaddingX + this.chartWidth - tipLength, i * this.gridHeight, c);
             }
         }
 
@@ -170,15 +175,19 @@ namespace display {
                     y -= this.font.charHeight / 2;
                 else if (i == 0)
                     y += this.font.charHeight / 2;
-                screen.print(text, this.chartWidth + 5, y, c, this.font);
+                screen.print(text, 0, y, c, this.font);
             }
             // Draw the x-axis labels
             for (let i = 0; i <= this.gridCols; i++) {
                 text = roundWithPrecision((i * xUnit + this.scaleXMin), 2).toString();
                 let x = i * this.gridWidth;
-                if (i > 0)
-                    x -= this.font.charWidth / 2; // move one char to the left
-                screen.print(text, x, this.chartHeight + (this.axisPaddingY - 2 - this.font.charHeight), c, this.font);
+                
+                if (i == this.xTicks) {
+                    x -= this.font.charWidth * (text.length - 0); // Move last entry on scree
+                } else {
+                    x -= this.font.charWidth / 2;
+                }
+                screen.print(text, x + this.axisPaddingX, this.chartHeight + (this.axisPaddingY - 2 - this.font.charHeight), c, this.font);
             }
         }
 
@@ -192,7 +201,7 @@ namespace display {
             let yFactor = this.chartHeight / yRange;
 
             for (let i = 0; i < this.values.length; i++) {
-                let nextX = (this.times[i] - this.scaleXMin) * xFactor;
+                let nextX = this.axisPaddingX + (this.times[i] - this.scaleXMin) * xFactor;
                 let nextY = this.chartHeight - ((this.values[i] - this.scaleYMin) * yFactor);
                 //screen.drawLine(prevX, prevY, nextX, nextY, c);
                 const dot = img`
