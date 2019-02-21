@@ -7,12 +7,14 @@ namespace graphs {
         Polar
     }
 
+    const xMin: number = 0;
+    const xMax: number = 5;
+    const yMin: number = 0;
+    const yMax: number = 10;
+
     export class Graph {
 
-        xMin: number = -8;
-        xMax: number = 8;
-        yMin: number = -6;
-        yMax: number = 6;
+        
 
         functions: GraphableFunction[];
         dataSeq: DataSequence[];
@@ -47,7 +49,7 @@ namespace graphs {
         }
 
         render() {
-            screen.fill(15);
+            screen.fill(1);
             this.drawCharts();
             this.drawDataSets();
             this.drawFunctions();
@@ -63,12 +65,12 @@ namespace graphs {
                 let interval: number;
                 switch (f.functionType) {
                     case FunctionType.XBased:
-                        bounds = [this.xMin, this.xMax];
-                        interval = (this.xMax - this.xMin) / screen.width;
+                        bounds = [xMin, xMax];
+                        interval = (xMax - xMin) / screen.width;
                         break;
                     case FunctionType.YBased:
-                        bounds = [this.yMin, this.yMax];
-                        interval = (this.yMax - this.yMin) / screen.height;
+                        bounds = [yMin, yMax];
+                        interval = (yMax - yMin) / screen.height;
                         break;
                     case FunctionType.Parametric:
                         bounds = f.bounds;
@@ -81,8 +83,8 @@ namespace graphs {
                 }
                 for (let p: number = bounds[0]; p <= bounds[1]; p += interval) {
                     let temp = f.compute(p);
-                    if ((temp[0] >= this.xMin) && (temp[0] <= this.xMax)
-                        && (temp[1] >= this.yMin) && (temp[1] <= this.yMax)) {
+                    if ((temp[0] >= xMin) && (temp[0] <= xMax)
+                        && (temp[1] >= yMin) && (temp[1] <= yMax)) {
                         if (last) {
                             screen.drawLine(this.getScreenX(temp[0]), this.getScreenY(temp[1]),
                                 this.getScreenX(last[0]), this.getScreenY(last[1]), f.color);
@@ -105,17 +107,17 @@ namespace graphs {
         }
 
         private getScreenX(x: number) {
-            if (x > this.xMax || x < this.xMin) {
+            if (x > xMax || x < xMin) {
                 return undefined;
             }
-            return (screen.width / (this.xMax - this.xMin)) * (x - this.xMin);
+            return (screen.width / (xMax - xMin)) * (x - xMin);
         }
 
         private getScreenY(y: number) {
-            if (y > this.yMax || y < this.yMin) {
+            if (y > yMax || y < yMin) {
                 return undefined;
             }
-            return screen.height - (screen.height / (this.yMax - this.yMin)) * (y - this.yMin);
+            return screen.height - (screen.height / (yMax - yMin)) * (y - yMin);
         }
 
         chartDataSeq(data: number[], kind: GraphType, color?: number) {
@@ -124,9 +126,9 @@ namespace graphs {
 
         plotDataSeq(data: number[], color?: number) {
             let dataSet: number[][] = [[], []];
-            let width: number = (this.yMax - this.yMin) / data.length;
+            let width: number = (yMax - yMin) / data.length;
             for (let i = 0; i < data.length; i++) {
-                dataSet[0].push(this.yMin + (width / 2) + (i * width));
+                dataSet[0].push(yMin + (width / 2) + (i * width));
                 dataSet[1].push(data[i]);
             }
             this.plotDataSet(dataSet, 0, 1, color ? color : 1);
@@ -143,10 +145,10 @@ namespace graphs {
                     case GraphType.Bar:
                         for (let i = 0; i < sequence.data.length; i++) {
                             let value: number = sequence.data[i];
-                            screen.fillRect(i * width,
+                            screen.fillRect(Math.floor(i * width),
                                 value > 0 ? this.getScreenY(value) : this.getScreenY(0),
-                                width,
-                                value == 0 ? 1 : (screen.height / (this.yMax - this.yMin)) * Math.abs(value),
+                                Math.floor((i + 1) * width) - Math.floor(i * width),
+                                value == 0 ? 1 : (screen.height / (yMax - yMin)) * Math.abs(value),
                                 sequence.color);
 
                         }

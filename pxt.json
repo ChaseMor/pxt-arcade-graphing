@@ -10,7 +10,8 @@
         "main.ts",
         "functiontypes.ts",
         "graph.ts",
-        "data.ts"
+        "data.ts",
+        "display.ts"
     ],
     "testFiles": [
         "test.ts"
