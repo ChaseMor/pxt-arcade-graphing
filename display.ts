@@ -7,7 +7,7 @@ namespace display {
         maxX: number;
         maxY: number;
 
-        constructor (xValues: number[], yValues: number[]) {
+        constructor(xValues: number[], yValues: number[]) {
             if (!xValues || xValues.length == 0 || !yValues || yValues.length == 0) {
                 return;
             }
@@ -42,7 +42,7 @@ namespace display {
             }
             return [min, max];
         }
-        
+
     }
 
     class Chart {

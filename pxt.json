@@ -3,7 +3,8 @@
     "version": "0.0.0",
     "description": "",
     "dependencies": {
-        "device": "*"
+        "device": "*",
+        "pxt-stats": "github:chasemor/pxt-stats"
     },
     "files": [
         "README.md",
