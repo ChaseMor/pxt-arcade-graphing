@@ -1,49 +1,4 @@
 namespace display {
-    class series {
-        xValues: number[];
-        yValues: number[];
-        minX: number;
-        minY: number;
-        maxX: number;
-        maxY: number;
-
-        constructor(xValues: number[], yValues: number[]) {
-            if (!xValues || xValues.length == 0 || !yValues || yValues.length == 0) {
-                return;
-            }
-            if (xValues.length != yValues.length) {
-                let min: number = Math.min(xValues.length, yValues.length);
-                xValues.splice(min, xValues.length - min);
-                yValues.splice(min, yValues.length - min);
-            }
-            this.xValues = xValues;
-            this.yValues = yValues;
-            let bounds: number[] = this.minMax(xValues);
-            this.minX = bounds[0];
-            this.maxX = bounds[1];
-            bounds = this.minMax(yValues);
-            this.minY = bounds[0];
-            this.maxY = bounds[1];
-        }
-
-        private minMax(values: number[]): number[] {
-            if (!values || values.length == 0) {
-                // Invalid Argument
-                return [];
-            }
-            let min: number = values[0];
-            let max: number = values[0];
-            for (let i = 1; i < values.length; i++) {
-                if (values[i] < min) {
-                    min = values[i];
-                } if (values[i] > max) {
-                    max = values[i];
-                }
-            }
-            return [min, max];
-        }
-
-    }
 
     class Chart {
         // Variables used for data configuration.
