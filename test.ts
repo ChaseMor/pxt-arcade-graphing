@@ -27,6 +27,9 @@ function plot() {
         case 3:
             plotIceCremeSeries();
             break;
+        case 4:
+            graphIceCremeSeries();
+            break;
     }
 }
 
@@ -61,6 +64,10 @@ function plotIceCremeSeries() {
     display.graphLine(dataSet.getLineOfBestFit());
 }
 
+function graphIceCremeSeries() {
+    display.graphSeries(datasets.temps, datasets.sales);
+}
+
 function logValues() {
     display.printValues();
 }
@@ -69,7 +76,7 @@ function logValues() {
 
 namespace datasets {
 
-    export const numOfSets = 4;
+    export const numOfSets = 5;
     // ice cream
     export let temps = [
         14.2, 16.4, 11.9, 15.2, 18.5, 22.1, 19.4, 25.1, 23.4, 18.1, 22.6, 17.2

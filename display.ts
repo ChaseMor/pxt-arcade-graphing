@@ -16,7 +16,7 @@ namespace display {
         coeff: number[];
         color: number;
     }
-    
+
     class Chart {
         // Variables used for data configuration.
         private font: image.Font;
@@ -84,20 +84,19 @@ namespace display {
             if (!dontSort) {
                 data.sort();
             }
-            this.dataSets.push({dataSet: data, kind: PlotType.Scatter, color: 1});
+            this.dataSets.push({ dataSet: data, kind: PlotType.Scatter, color: 1 });
         }
 
         public graphSeries(xValues: number[], yValues: number[], dontSort?: boolean) {
             let data: stats.DataSet = new stats.DataSet(xValues, yValues);
-
             if (!dontSort) {
                 data.sort();
             }
-            this.dataSets.push({dataSet: data, kind: PlotType.Line, color: 1 });
+            this.dataSets.push({dataSet: data, kind: PlotType.Line, color: 1});
         }
 
         public graphLine(coeff: number[]) {
-            this.lines.push({coeff: coeff, color: 1});
+            this.lines.push({ coeff: coeff, color: 1 });
         }
 
         public addPoint(value: number) {
@@ -166,8 +165,6 @@ namespace display {
                 }
             }
 
-
-
             // avoid empty interval
             if (this.scaleXMin === this.scaleXMax)
                 this.scaleXMax = this.scaleXMin + 1; // TODO
@@ -205,7 +202,7 @@ namespace display {
 
             this.xFactor = this.chartWidth / this.xRange;
             this.yFactor = this.chartHeight / this.yRange;
-            
+
         }
 
         private drawChartGrid() {
@@ -268,12 +265,12 @@ namespace display {
         }
 
         private drawGraphPoints() {
-            const c = this.lineColor;
-            
+            let c = this.lineColor;
+
 
             for (let i = 0; i < this.values.length; i++) {
-                    let nextX = this.getScreenX(this.times[i]);
-                    let nextY = this.getScreenY(this.values[i]);
+                let nextX = this.getScreenX(this.times[i]);
+                let nextY = this.getScreenY(this.values[i]);
                 const dot = img`
                     1 1 1
                     1 . 1
@@ -285,18 +282,38 @@ namespace display {
 
             for (let i = 0; i < this.dataSets.length; i++) {
                 let data = this.dataSets[i].dataSet;
-                for (let i = 0; i < data.length(); i++) {
-                    let nextX = this.getScreenX(data.getXAtIndex(i));
-                    let nextY = this.getScreenY(data.getYAtIndex(i));
-                    //screen.drawLine(prevX, prevY, nextX, nextY, c);
-                    const dot = img`
-                        1 1 1
-                        1 . 1
-                        1 1 1
-                    `;
-                    dot.replace(1, c)
-                    screen.drawTransparentImage(dot, nextX - 1, nextY - 1);
+                c = this.dataSets[i].color;
+                switch (this.dataSets[i].kind) {
+                    case PlotType.Scatter:
+                        for (let i = 0; i < data.length(); i++) {
+                            let nextX = this.getScreenX(data.getXAtIndex(i));
+                            let nextY = this.getScreenY(data.getYAtIndex(i));
+                            //screen.drawLine(prevX, prevY, nextX, nextY, c);
+                            const dot = img`
+                                1 1 1
+                                1 . 1
+                                1 1 1
+                            `;
+                            dot.replace(1, c)
+                            screen.drawTransparentImage(dot, nextX - 1, nextY - 1);
+                        }
+                        break;
+                    case PlotType.Line:
+                        if (data.length() <= 1) {
+                            break;
+                        }
+                        let prevX = this.getScreenX(data.getXAtIndex(0));
+                        let prevY = this.getScreenY(data.getYAtIndex(0));
+                        for (let i = 1; i < data.length(); i++) {
+                            let nextX = this.getScreenX(data.getXAtIndex(i));
+                            let nextY = this.getScreenY(data.getYAtIndex(i));
+                            screen.drawLine(prevX, prevY, nextX, nextY, c);
+                            prevX = nextX;
+                            prevY = nextY;
+                        }
+                        break;
                 }
+
             }
 
         }
@@ -327,7 +344,7 @@ namespace display {
             return this.chartHeight - ((y - this.scaleYMin) * this.yFactor)
         }
     }
-    
+
 
 
     // helpers
