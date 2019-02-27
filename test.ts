@@ -25,7 +25,7 @@ function plot() {
             plotMarvel();
             break;
         case 3:
-            plotIceCremeSeries();
+            plotDuelData();
             break;
         case 4:
             graphIceCremeSeries();
@@ -35,27 +35,20 @@ function plot() {
 
 
 function plotIceCreme() {
-    for (let i = 0; i < datasets.temps.length; i++) {
-        display.graphPoint(datasets.temps[i], datasets.sales[i])
-    }
+    display.plotSeries(datasets.temps, datasets.sales);
 }
 
 function plotMakeCodePop() {
-    for (let i = 0; i < datasets.days.length; i++) {
-        display.graphPoint(datasets.days[i], datasets.popularity[i])
-    }
+    display.plotSeries(datasets.days, datasets.popularity);
 }
 
 function plotMarvel() {
-    for (let i = 0; i < datasets.boxOffice.length; i++) {
-        display.graphPoint(datasets.boxOffice[i], datasets.ratings[i])
-    }
+    display.plotSeries(datasets.boxOffice, datasets.ratings)
 }
 
 function plotDuelData() {
-    for (let i = 0; i < datasets.boxOffice.length; i++) {
-        display.graphPoint(datasets.boxOffice[i], datasets.ratings[i])
-    }
+    display.plotSeries(datasets.duelData[0], datasets.duelData[1]);
+    display.plotSeries(datasets.duelData[2], datasets.duelData[3]);
 }
 
 function plotIceCremeSeries() {
@@ -67,11 +60,6 @@ function plotIceCremeSeries() {
 function graphIceCremeSeries() {
     display.graphSeries(datasets.temps, datasets.sales);
 }
-
-function logValues() {
-    display.printValues();
-}
-
 
 
 namespace datasets {

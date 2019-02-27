@@ -20,8 +20,6 @@ namespace display {
     class Chart {
         // Variables used for data configuration.
         private font: image.Font;
-        private times: number[];
-        private values: number[];
 
         // grid
         private gridRows: number;
@@ -65,8 +63,6 @@ namespace display {
             this.axisPaddingY = this.font.charHeight + 4;
             this.gridRows = 2;
             this.gridCols = 2; // computed on the fly
-            this.times = [];
-            this.values = [];
             this.chartWidth = screen.width - this.axisPaddingX;
             this.chartHeight = screen.height - this.axisPaddingY;
             this.maxEntries = (this.chartWidth - 2);
@@ -99,24 +95,6 @@ namespace display {
             this.lines.push({ coeff: coeff, color: 1 });
         }
 
-        public addPoint(value: number) {
-            this.addPoint2d(control.millis() / 1000, value)
-        }
-
-        public addPoint2d(valueX: number, valueY: number) {
-            let i = 0;
-            while (i < this.times.length && this.times[i] > valueX) {
-                i++;
-            }
-            this.times.insertAt(i, valueX);
-            this.values.insertAt(i, valueY);
-
-            if (this.times.length > this.maxEntries) {
-                this.times = this.times.slice(this.times.length - this.maxEntries - 1, this.times.length - 1);
-                this.values = this.values.slice(this.values.length - this.maxEntries - 1, this.values.length - 1);
-            }
-        }
-
         public render() {
             //if (this.times.length < 2) return;
             this.calculateScale();
@@ -130,28 +108,7 @@ namespace display {
         private calculateScale() {
             // Find min and max x values
 
-            if (this.times && this.times.length > 0) {
-                this.scaleXMax = this.times[0];
-                this.scaleXMin = this.times[0];
-                for (let j = 0, len2 = this.times.length; j < len2; j++) {
-                    if (this.scaleXMax < this.times[j]) {
-                        this.scaleXMax = this.times[j];
-                    }
-                    if (this.scaleXMin > this.times[j]) {
-                        this.scaleXMin = this.times[j];
-                    }
-                }
-                this.scaleYMax = this.values[0];
-                this.scaleYMin = this.values[0];
-                for (let j = 0, len2 = this.values.length; j < len2; j++) {
-                    if (this.scaleYMax < this.values[j]) {
-                        this.scaleYMax = this.values[j];
-                    }
-                    if (this.scaleYMin > this.values[j]) {
-                        this.scaleYMin = this.values[j];
-                    }
-                }
-            } else if (this.dataSets.length > 0) {
+            if (this.dataSets.length > 0) {
                 this.scaleXMin = this.dataSets[0].dataSet.getMinX();
                 this.scaleXMax = this.dataSets[0].dataSet.getMaxX();
                 this.scaleYMin = this.dataSets[0].dataSet.getMinY();
@@ -175,8 +132,6 @@ namespace display {
             let rx = generateSteps(this.scaleXMin, this.scaleXMax, this.xTicks);
             this.scaleXMin = rx[0];
             this.scaleXMax = rx[1];
-            // this.scaleXMin = this.times[this.times.length - 1];
-            // this.scaleXMax = this.times[0];
             this.gridCols = rx[2];
             let ry = generateSteps(this.scaleYMin, this.scaleYMax, this.yTicks);
             this.scaleYMin = ry[0];
@@ -221,16 +176,6 @@ namespace display {
             }
         }
 
-
-        public printValues() {
-            this.times.reverse();
-            this.values.reverse();
-            console.log("x = [" + this.times.join(", ") + "]");
-            console.log("y = [" + this.values.join(", ") + "]");
-            this.times.reverse();
-            this.values.reverse();
-        }
-
         private drawAxes() {
             const c = this.axisColor;
             const xRange = this.scaleXMax - this.scaleXMin;
@@ -265,24 +210,9 @@ namespace display {
         }
 
         private drawGraphPoints() {
-            let c = this.lineColor;
-
-
-            for (let i = 0; i < this.values.length; i++) {
-                let nextX = this.getScreenX(this.times[i]);
-                let nextY = this.getScreenY(this.values[i]);
-                const dot = img`
-                    1 1 1
-                    1 . 1
-                    1 1 1
-                `;
-                dot.replace(1, c)
-                screen.drawTransparentImage(dot, nextX - 1, nextY - 1)
-            }
-
             for (let i = 0; i < this.dataSets.length; i++) {
                 let data = this.dataSets[i].dataSet;
-                c = this.dataSets[i].color;
+                const c = this.dataSets[i].color;
                 switch (this.dataSets[i].kind) {
                     case PlotType.Scatter:
                         for (let i = 0; i < data.length(); i++) {
@@ -434,31 +364,6 @@ namespace display {
 
 
     let chart: Chart;
-    /**
-     * Adds a new point to the trend chart and renders it to the screen.
-     */
-    //% group="Charts"
-    //% blockId=graphadd block="graph %value"
-    //% blockGap=8
-    export function graph(value: number) {
-        if (!chart)
-            chart = new Chart();
-        chart.addPoint(value);
-        //chart.render();
-    }
-
-    /**
-     * Adds a new point to the trend chart and renders it to the screen.
-     */
-    //% group="Charts"
-    //% blockId=graphadd block="graph %value"
-    //% blockGap=8
-    export function graphPoint(valueX: number, valueY: number) {
-        if (!chart)
-            chart = new Chart();
-        chart.addPoint2d(valueX, valueY);
-        //chart.render();
-    }
 
     export function plotSeries(xValues: number[], yValues: number[]) {
         if (!chart)
@@ -486,10 +391,6 @@ namespace display {
             chart.render();
         }
     })
-
-    export function printValues() {
-        chart.printValues()
-    }
 
     /**
      * Clears the trend chart and the screen
