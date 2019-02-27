@@ -48,7 +48,7 @@ namespace display {
 
         public backgroundColor: number;
         public axisColor: number;
-        public lineColor: number;
+        public plotColors: number[];
 
         private dataSets: DataSeries[];
         private lines: GraphLines[];
@@ -57,7 +57,7 @@ namespace display {
             this.font = image.font5;
             this.backgroundColor = 0;
             this.axisColor = 1;
-            this.lineColor = 1;
+            this.plotColors = [0x9, 0x2, 0x7, 0x4, 0xa, 0x5, 0x1, 0x3, 0x6, 0xb, 0x8, 0xc, 0xd, 0xe];
 
             this.axisPaddingX = 22;
             this.axisPaddingY = this.font.charHeight + 4;
@@ -80,7 +80,11 @@ namespace display {
             if (!dontSort) {
                 data.sort();
             }
-            this.dataSets.push({ dataSet: data, kind: PlotType.Scatter, color: 1 });
+            this.dataSets.push({
+                dataSet: data,
+                kind: PlotType.Scatter,
+                color: this.plotColors[(this.dataSets.length + this.lines.length) % this.plotColors.length]
+            });
         }
 
         public graphSeries(xValues: number[], yValues: number[], dontSort?: boolean) {
@@ -88,11 +92,18 @@ namespace display {
             if (!dontSort) {
                 data.sort();
             }
-            this.dataSets.push({dataSet: data, kind: PlotType.Line, color: 1});
+            this.dataSets.push({
+                dataSet: data,
+                kind: PlotType.Line,
+                color: this.plotColors[(this.dataSets.length + this.lines.length) % this.plotColors.length]
+            });
         }
 
         public graphLine(coeff: number[]) {
-            this.lines.push({ coeff: coeff, color: 1 });
+            this.lines.push({
+                coeff: coeff,
+                color: this.plotColors[(this.dataSets.length + this.lines.length) % this.plotColors.length]
+            });
         }
 
         public render() {
