@@ -127,9 +127,9 @@ namespace display {
 
                 for (let i = 1; i < this.dataSets.length; i++) {
                     this.scaleXMin = Math.min(this.scaleXMin, this.dataSets[i].dataSet.getMinX());
-                    this.scaleXMax = Math.min(this.scaleXMax, this.dataSets[i].dataSet.getMaxX());
+                    this.scaleXMax = Math.max(this.scaleXMax, this.dataSets[i].dataSet.getMaxX());
                     this.scaleYMin = Math.min(this.scaleYMin, this.dataSets[i].dataSet.getMinY());
-                    this.scaleYMax = Math.min(this.scaleYMax, this.dataSets[i].dataSet.getMaxY());
+                    this.scaleYMax = Math.max(this.scaleYMax, this.dataSets[i].dataSet.getMaxY());
                 }
             }
 
