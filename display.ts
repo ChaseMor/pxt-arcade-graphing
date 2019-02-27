@@ -55,9 +55,9 @@ namespace display {
 
         constructor() {
             this.font = image.font5;
-            this.backgroundColor = 0;
-            this.axisColor = 1;
-            this.plotColors = [0x9, 0x2, 0x7, 0x4, 0xa, 0x5, 0x1, 0x3, 0x6, 0xb, 0x8, 0xc, 0xd, 0xe];
+            this.backgroundColor = 0xb;
+            this.axisColor = 0xf;
+            this.plotColors = [0x8, 0x2, 0x7, 0x4, 0xa, 0x5, 0x1, 0x3, 0x6, 0xf, 0x9, 0xc, 0xd, 0xe];
 
             this.axisPaddingX = 22;
             this.axisPaddingY = this.font.charHeight + 4;
@@ -110,10 +110,10 @@ namespace display {
             //if (this.times.length < 2) return;
             this.calculateScale();
             screen.fill(this.backgroundColor);
-            this.drawAxes();
-            this.drawChartGrid();
             this.drawGraphPoints();
             this.drawLines();
+            this.drawAxes();
+            this.drawChartGrid();
         }
 
         private calculateScale() {
