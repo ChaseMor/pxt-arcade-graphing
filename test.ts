@@ -11,6 +11,7 @@ controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
     plot();
 })
 
+
 function plot() {
     display.graphClear();
     switch (index) {
@@ -22,6 +23,9 @@ function plot() {
             break;
         case 2:
             plotMarvel();
+            break;
+        case 3:
+            plotIceCremeSeries();
             break;
     }
 }
@@ -51,6 +55,10 @@ function plotDuelData() {
     }
 }
 
+function plotIceCremeSeries() {
+    display.plotSeries(datasets.temps, datasets.sales);
+}
+
 function logValues() {
     display.printValues();
 }
@@ -59,7 +67,7 @@ function logValues() {
 
 namespace datasets {
 
-    export const numOfSets = 3;
+    export const numOfSets = 4;
     // ice cream
     export let temps = [
         14.2, 16.4, 11.9, 15.2, 18.5, 22.1, 19.4, 25.1, 23.4, 18.1, 22.6, 17.2

@@ -31,6 +31,8 @@ namespace display {
         public axisColor: number;
         public lineColor: number;
 
+        private dataSets: stats.DataSet[];
+
         constructor() {
             this.font = image.font5;
             this.backgroundColor = 0;
@@ -49,10 +51,17 @@ namespace display {
 
             this.xTicks = 4;
             this.yTicks = 6;
+
+            this.dataSets = [];
         }
 
-        public plotSeries(xValues: number[], yValues: number) {
+        public plotSeries(xValues: number[], yValues: number[], dontSort?: boolean) {
+            let data: stats.DataSet = new stats.DataSet(xValues, yValues);
 
+            if (!dontSort) {
+                data.sort();
+            }
+            this.dataSets.push(data);
         }
 
         public addPoint(value: number) {
@@ -74,7 +83,7 @@ namespace display {
         }
 
         public render() {
-            if (this.times.length < 2) return;
+            //if (this.times.length < 2) return;
             this.calculateScale();
             screen.fill(this.backgroundColor);
             this.drawAxes();
@@ -83,26 +92,44 @@ namespace display {
         }
 
         private calculateScale() {
-            this.scaleXMax = this.times[0];
-            this.scaleXMin = this.times[0];
-            for (let j = 0, len2 = this.times.length; j < len2; j++) {
-                if (this.scaleXMax < this.times[j]) {
-                    this.scaleXMax = this.times[j];
+            // Find min and max x values
+
+            if (this.times && this.times.length > 0) {
+                this.scaleXMax = this.times[0];
+                this.scaleXMin = this.times[0];
+                for (let j = 0, len2 = this.times.length; j < len2; j++) {
+                    if (this.scaleXMax < this.times[j]) {
+                        this.scaleXMax = this.times[j];
+                    }
+                    if (this.scaleXMin > this.times[j]) {
+                        this.scaleXMin = this.times[j];
+                    }
                 }
-                if (this.scaleXMin > this.times[j]) {
-                    this.scaleXMin = this.times[j];
+                this.scaleYMax = this.values[0];
+                this.scaleYMin = this.values[0];
+                for (let j = 0, len2 = this.values.length; j < len2; j++) {
+                    if (this.scaleYMax < this.values[j]) {
+                        this.scaleYMax = this.values[j];
+                    }
+                    if (this.scaleYMin > this.values[j]) {
+                        this.scaleYMin = this.values[j];
+                    }
+                }
+            } else if (this.dataSets.length > 0) {
+                this.scaleXMin = this.dataSets[0].getMinX();
+                this.scaleXMax = this.dataSets[0].getMaxX();
+                this.scaleYMin = this.dataSets[0].getMinY();
+                this.scaleYMax = this.dataSets[0].getMaxY();
+
+                for (let i = 1; i < this.dataSets.length; i++) {
+                    this.scaleXMin = Math.min(this.scaleXMin, this.dataSets[i].getMinX());
+                    this.scaleXMax = Math.min(this.scaleXMax, this.dataSets[i].getMaxX());
+                    this.scaleYMin = Math.min(this.scaleYMin, this.dataSets[i].getMinY());
+                    this.scaleYMax = Math.min(this.scaleYMax, this.dataSets[i].getMaxY());
                 }
             }
-            this.scaleYMax = this.values[0];
-            this.scaleYMin = this.values[0];
-            for (let j = 0, len2 = this.values.length; j < len2; j++) {
-                if (this.scaleYMax < this.values[j]) {
-                    this.scaleYMax = this.values[j];
-                }
-                if (this.scaleYMin > this.values[j]) {
-                    this.scaleYMin = this.values[j];
-                }
-            }
+
+
 
             // avoid empty interval
             if (this.scaleXMin === this.scaleXMax)
@@ -203,7 +230,7 @@ namespace display {
             const yRange = this.scaleYMax - this.scaleYMin;
 
             const xFactor = this.chartWidth / xRange;
-            let yFactor = this.chartHeight / yRange;
+            const yFactor = this.chartHeight / yRange;
 
             for (let i = 0; i < this.values.length; i++) {
                 let nextX = this.axisPaddingX + (this.times[i] - this.scaleXMin) * xFactor;
@@ -216,6 +243,21 @@ namespace display {
                 `;
                 dot.replace(1, c)
                 screen.drawTransparentImage(dot, nextX - 1, nextY - 1)
+            }
+
+            for (let data of this.dataSets) {
+                for (let i = 0; i < data.length(); i++) {
+                    let nextX = this.axisPaddingX + (data.getXAtIndex(i) - this.scaleXMin) * xFactor;
+                    let nextY = this.chartHeight - ((data.getYAtIndex(i) - this.scaleYMin) * yFactor);
+                    //screen.drawLine(prevX, prevY, nextX, nextY, c);
+                    const dot = img`
+                        1 1 1
+                        1 . 1
+                        1 1 1
+                    `;
+                    dot.replace(1, c)
+                    screen.drawTransparentImage(dot, nextX - 1, nextY - 1);
+                }
             }
 
         }
@@ -333,6 +375,12 @@ namespace display {
             chart = new Chart();
         chart.addPoint2d(valueX, valueY);
         //chart.render();
+    }
+
+    export function plotSeries(xValues: number[], yValues: number[]) {
+        if (!chart)
+            chart = new Chart();
+        chart.plotSeries(xValues, yValues);
     }
 
     game.onPaint(function () {
