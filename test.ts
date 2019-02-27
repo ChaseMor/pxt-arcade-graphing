@@ -57,6 +57,8 @@ function plotDuelData() {
 
 function plotIceCremeSeries() {
     display.plotSeries(datasets.temps, datasets.sales);
+    let dataSet = new stats.DataSet(datasets.temps, datasets.sales);
+    display.graphLine(dataSet.getLineOfBestFit());
 }
 
 function logValues() {

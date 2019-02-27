@@ -1,5 +1,22 @@
 namespace display {
 
+    enum PlotType {
+        Scatter,
+        Line,
+        Histogram
+    }
+
+    interface DataSeries {
+        dataSet: stats.DataSet;
+        kind: PlotType;
+        color: number;
+    }
+
+    interface GraphLines {
+        coeff: number[];
+        color: number;
+    }
+    
     class Chart {
         // Variables used for data configuration.
         private font: image.Font;
@@ -23,6 +40,10 @@ namespace display {
         private scaleYMax: number;
         private axisPaddingX: number;
         private axisPaddingY: number;
+        private xRange: number;
+        private yRange: number;
+        private xFactor: number;
+        private yFactor: number;
 
         // estimated best number of entries
         private maxEntries: number;
@@ -31,7 +52,8 @@ namespace display {
         public axisColor: number;
         public lineColor: number;
 
-        private dataSets: stats.DataSet[];
+        private dataSets: DataSeries[];
+        private lines: GraphLines[];
 
         constructor() {
             this.font = image.font5;
@@ -53,6 +75,7 @@ namespace display {
             this.yTicks = 6;
 
             this.dataSets = [];
+            this.lines = []
         }
 
         public plotSeries(xValues: number[], yValues: number[], dontSort?: boolean) {
@@ -61,7 +84,20 @@ namespace display {
             if (!dontSort) {
                 data.sort();
             }
-            this.dataSets.push(data);
+            this.dataSets.push({dataSet: data, kind: PlotType.Scatter, color: 1});
+        }
+
+        public graphSeries(xValues: number[], yValues: number[], dontSort?: boolean) {
+            let data: stats.DataSet = new stats.DataSet(xValues, yValues);
+
+            if (!dontSort) {
+                data.sort();
+            }
+            this.dataSets.push({dataSet: data, kind: PlotType.Line, color: 1 });
+        }
+
+        public graphLine(coeff: number[]) {
+            this.lines.push({coeff: coeff, color: 1});
         }
 
         public addPoint(value: number) {
@@ -89,6 +125,7 @@ namespace display {
             this.drawAxes();
             this.drawChartGrid();
             this.drawGraphPoints();
+            this.drawLines();
         }
 
         private calculateScale() {
@@ -116,16 +153,16 @@ namespace display {
                     }
                 }
             } else if (this.dataSets.length > 0) {
-                this.scaleXMin = this.dataSets[0].getMinX();
-                this.scaleXMax = this.dataSets[0].getMaxX();
-                this.scaleYMin = this.dataSets[0].getMinY();
-                this.scaleYMax = this.dataSets[0].getMaxY();
+                this.scaleXMin = this.dataSets[0].dataSet.getMinX();
+                this.scaleXMax = this.dataSets[0].dataSet.getMaxX();
+                this.scaleYMin = this.dataSets[0].dataSet.getMinY();
+                this.scaleYMax = this.dataSets[0].dataSet.getMaxY();
 
                 for (let i = 1; i < this.dataSets.length; i++) {
-                    this.scaleXMin = Math.min(this.scaleXMin, this.dataSets[i].getMinX());
-                    this.scaleXMax = Math.min(this.scaleXMax, this.dataSets[i].getMaxX());
-                    this.scaleYMin = Math.min(this.scaleYMin, this.dataSets[i].getMinY());
-                    this.scaleYMax = Math.min(this.scaleYMax, this.dataSets[i].getMaxY());
+                    this.scaleXMin = Math.min(this.scaleXMin, this.dataSets[i].dataSet.getMinX());
+                    this.scaleXMax = Math.min(this.scaleXMax, this.dataSets[i].dataSet.getMaxX());
+                    this.scaleYMin = Math.min(this.scaleYMin, this.dataSets[i].dataSet.getMinY());
+                    this.scaleYMax = Math.min(this.scaleYMax, this.dataSets[i].dataSet.getMaxY());
                 }
             }
 
@@ -151,8 +188,8 @@ namespace display {
 
             // update y-axis width
             let xl = 0;
-            const yRange = this.scaleYMax - this.scaleYMin;
-            const yUnit = yRange / this.gridRows;
+            this.yRange = this.scaleYMax - this.scaleYMin;
+            const yUnit = this.yRange / this.gridRows;
             for (let i = 0; i <= this.gridRows; ++i)
                 xl = Math.max(roundWithPrecision(this.scaleYMax - (i * yUnit), 2).toString().length, xl);
             this.axisPaddingX = xl * this.font.charWidth + 5;
@@ -162,6 +199,13 @@ namespace display {
             // Calculate the grid for background / scale.
             this.gridWidth = this.chartWidth / this.gridCols;  // This is the width of the grid cells (background and axes).
             this.gridHeight = this.chartHeight / this.gridRows; // This is the height of the grid cells (background axes).
+
+            // Determine the scaling factor based on the min / max ranges.
+            this.xRange = this.scaleXMax - this.scaleXMin;
+
+            this.xFactor = this.chartWidth / this.xRange;
+            this.yFactor = this.chartHeight / this.yRange;
+            
         }
 
         private drawChartGrid() {
@@ -225,17 +269,11 @@ namespace display {
 
         private drawGraphPoints() {
             const c = this.lineColor;
-            // Determine the scaling factor based on the min / max ranges.
-            const xRange = this.scaleXMax - this.scaleXMin;
-            const yRange = this.scaleYMax - this.scaleYMin;
-
-            const xFactor = this.chartWidth / xRange;
-            const yFactor = this.chartHeight / yRange;
+            
 
             for (let i = 0; i < this.values.length; i++) {
-                let nextX = this.axisPaddingX + (this.times[i] - this.scaleXMin) * xFactor;
-                let nextY = this.chartHeight - ((this.values[i] - this.scaleYMin) * yFactor);
-                //screen.drawLine(prevX, prevY, nextX, nextY, c);
+                    let nextX = this.getScreenX(this.times[i]);
+                    let nextY = this.getScreenY(this.values[i]);
                 const dot = img`
                     1 1 1
                     1 . 1
@@ -245,10 +283,11 @@ namespace display {
                 screen.drawTransparentImage(dot, nextX - 1, nextY - 1)
             }
 
-            for (let data of this.dataSets) {
+            for (let i = 0; i < this.dataSets.length; i++) {
+                let data = this.dataSets[i].dataSet;
                 for (let i = 0; i < data.length(); i++) {
-                    let nextX = this.axisPaddingX + (data.getXAtIndex(i) - this.scaleXMin) * xFactor;
-                    let nextY = this.chartHeight - ((data.getYAtIndex(i) - this.scaleYMin) * yFactor);
+                    let nextX = this.getScreenX(data.getXAtIndex(i));
+                    let nextY = this.getScreenY(data.getYAtIndex(i));
                     //screen.drawLine(prevX, prevY, nextX, nextY, c);
                     const dot = img`
                         1 1 1
@@ -261,7 +300,34 @@ namespace display {
             }
 
         }
+
+        private drawLines() {
+            if (this.dataSets.length == 0) {
+                // no bounds have been set
+                return;
+            }
+            for (let i = 0; i < this.lines.length; i++) {
+                let coeff = this.lines[i].coeff;
+                // TODO add support for quadratics and beyond
+                if (coeff.length > 2) {
+                    this.lines[i].coeff.splice(coeff.length - 2, coeff.length);
+                }
+                let intercept: number = coeff[coeff.length - 1];
+                let slope: number = coeff.length > 1 ? coeff[coeff.length - 2] : 0;
+                screen.drawLine(this.axisPaddingX, this.getScreenY(intercept + slope * this.scaleXMin),
+                    this.axisPaddingX + this.chartWidth, this.getScreenY(intercept + slope * this.scaleXMax), this.lines[i].color);
+            }
+        }
+
+        private getScreenX(x: number): number {
+            return this.axisPaddingX + (x - this.scaleXMin) * this.xFactor;
+        }
+
+        private getScreenY(y: number): number {
+            return this.chartHeight - ((y - this.scaleYMin) * this.yFactor)
+        }
     }
+    
 
 
     // helpers
@@ -381,6 +447,21 @@ namespace display {
         if (!chart)
             chart = new Chart();
         chart.plotSeries(xValues, yValues);
+    }
+
+    export function graphSeries(xValues: number[], yValues: number[]) {
+        if (!chart)
+            chart = new Chart();
+        chart.graphSeries(xValues, yValues);
+    }
+
+    export function graphLine(coeff: number[]) {
+        if (!coeff || coeff.length == 0) {
+            return;
+        }
+        if (!chart)
+            chart = new Chart();
+        chart.graphLine(coeff);
     }
 
     game.onPaint(function () {
