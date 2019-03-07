@@ -1,13 +1,13 @@
 let index = 0;
 
 controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
-    index = (index + datasets.numOfSets - 1) % datasets.numOfSets;
+    index = (index + numOfSets - 1) % numOfSets;
     plot();
 })
 
 
 controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
-    index = (index + 1) % datasets.numOfSets;
+    index = (index + 1) % numOfSets;
     plot();
 })
 
@@ -30,9 +30,13 @@ function plot() {
         case 4:
             graphIceCremeSeries();
             break;
+        case 5:
+            plotIceCremeSeries();
+            break;
     }
 }
 
+const numOfSets = 6;
 
 function plotIceCreme() {
     display.plotSeries(datasets.temps, datasets.sales);
@@ -43,7 +47,7 @@ function plotMakeCodePop() {
 }
 
 function plotMarvel() {
-    display.plotSeries(datasets.boxOffice, datasets.ratings)
+    display.plotSeries(datasets.boxOffice, datasets.ratings);
 }
 
 function plotDuelData() {
@@ -53,18 +57,15 @@ function plotDuelData() {
 
 function plotIceCremeSeries() {
     display.plotSeries(datasets.temps, datasets.sales);
-    let dataSet = new stats.DataSet(datasets.temps, datasets.sales);
-    display.graphLine(dataSet.getLineOfBestFit());
+    display.graphBestFit(datasets.temps, datasets.sales);
 }
 
 function graphIceCremeSeries() {
     display.graphSeries(datasets.temps, datasets.sales);
 }
 
-
 namespace datasets {
 
-    export const numOfSets = 5;
     // ice cream
     export let temps = [
         14.2, 16.4, 11.9, 15.2, 18.5, 22.1, 19.4, 25.1, 23.4, 18.1, 22.6, 17.2
@@ -93,21 +94,3 @@ namespace datasets {
 }
 
 plot();
-
-/*namespace graphs {
-    let g: Graph = new Graph();
-
-    // g.gridVisability = false;
-
-    let data: number[] = [9, 6, 6, 2, 4, 6, 4, 9, 7, 3, 2, 7, 2, 6, 3, 7, 1, 9, 9, 1, 2, 7];
-    g.chartDataSeq(data, GraphType.Bar, 7)
-    g.plotDataSet([[0, 1, 2, 3, 4], [4, 3, 2, 1, 0], [1, 1, 1, 1, 1]], 0, 1, 15)
-}
-
-*/
-
-/*
-controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
-    display.graph(Math.sin(game.runtime() / 1000))
-})
-*/

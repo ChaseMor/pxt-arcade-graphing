@@ -272,8 +272,15 @@ namespace display {
                 }
                 let intercept: number = coeff[coeff.length - 1];
                 let slope: number = coeff.length > 1 ? coeff[coeff.length - 2] : 0;
-                screen.drawLine(this.axisPaddingX, this.getScreenY(intercept + slope * this.scaleXMin),
-                    this.axisPaddingX + this.chartWidth, this.getScreenY(intercept + slope * this.scaleXMax), this.lines[i].color);
+                if (intercept + slope * this.scaleXMin < this.scaleYMin) {
+                    let xIntercept = (this.scaleYMin - intercept) / slope; 
+                    screen.drawLine(this.getScreenX(xIntercept), this.getScreenY(intercept + slope * xIntercept),
+                        this.axisPaddingX + this.chartWidth, this.getScreenY(intercept + slope * this.scaleXMax), this.lines[i].color);
+
+                } else {    
+                    screen.drawLine(this.axisPaddingX, this.getScreenY(intercept + slope * this.scaleXMin),
+                        this.axisPaddingX + this.chartWidth, this.getScreenY(intercept + slope * this.scaleXMax), this.lines[i].color);
+                }
             }
         }
 
