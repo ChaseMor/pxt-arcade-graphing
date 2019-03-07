@@ -397,6 +397,11 @@ namespace display {
         chart.graphLine(coeff);
     }
 
+    export function graphBestFit(xValues: number[], yValues: number[]) {
+        const dataSet: stats.DataSet = new stats.DataSet(xValues, yValues);
+        graphLine(dataSet.getLineOfBestFit());
+    }
+
     game.onPaint(function () {
         if (chart) {
             chart.render();
