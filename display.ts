@@ -229,12 +229,21 @@ namespace display {
                         for (let i = 0; i < data.length(); i++) {
                             let nextX = this.getScreenX(data.getXAtIndex(i));
                             let nextY = this.getScreenY(data.getYAtIndex(i));
-                            //screen.drawLine(prevX, prevY, nextX, nextY, c);
                             const dot = img`
                                 1 1 1
                                 1 . 1
                                 1 1 1
                             `;
+                            if (nextX == this.axisPaddingX) {
+                                dot.setPixel(0, 0, 0);
+                                dot.setPixel(0, 1, 0);
+                                dot.setPixel(0, 2, 0);
+                            }
+                            if (nextY == this.chartHeight) {
+                                dot.setPixel(0, 2, 0);
+                                dot.setPixel(1, 2, 0);
+                                dot.setPixel(2, 2, 0);
+                            }
                             dot.replace(1, c)
                             screen.drawTransparentImage(dot, nextX - 1, nextY - 1);
                         }
@@ -285,11 +294,11 @@ namespace display {
         }
 
         private getScreenX(x: number): number {
-            return this.axisPaddingX + (x - this.scaleXMin) * this.xFactor;
+            return Math.round(this.axisPaddingX + (x - this.scaleXMin) * this.xFactor);
         }
 
         private getScreenY(y: number): number {
-            return this.chartHeight - ((y - this.scaleYMin) * this.yFactor)
+            return Math.round(this.chartHeight - (y - this.scaleYMin) * this.yFactor);
         }
     }
 
