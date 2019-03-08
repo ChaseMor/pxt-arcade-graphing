@@ -175,7 +175,7 @@ namespace display {
             const c = this.axisColor;
             const tipLength = 3;
 
-            screen.drawRect(this.axisPaddingX, 0, this.chartWidth, this.chartHeight, c);
+            screen.drawRect(this.axisPaddingX, 0, this.chartWidth + 1, this.chartHeight + 1, c);
 
             for (let i = 0; i < this.gridCols; i++) {
                 screen.drawLine(this.axisPaddingX + i * this.gridWidth, this.chartHeight, this.axisPaddingX + i * this.gridWidth, this.chartHeight - tipLength, c);
@@ -273,11 +273,11 @@ namespace display {
                 let intercept: number = coeff[coeff.length - 1];
                 let slope: number = coeff.length > 1 ? coeff[coeff.length - 2] : 0;
                 if (intercept + slope * this.scaleXMin < this.scaleYMin) {
-                    let xIntercept = (this.scaleYMin - intercept) / slope; 
+                    let xIntercept = (this.scaleYMin - intercept) / slope;
                     screen.drawLine(this.getScreenX(xIntercept), this.getScreenY(intercept + slope * xIntercept),
                         this.axisPaddingX + this.chartWidth, this.getScreenY(intercept + slope * this.scaleXMax), this.lines[i].color);
 
-                } else {    
+                } else {
                     screen.drawLine(this.axisPaddingX, this.getScreenY(intercept + slope * this.scaleXMin),
                         this.axisPaddingX + this.chartWidth, this.getScreenY(intercept + slope * this.scaleXMax), this.lines[i].color);
                 }
