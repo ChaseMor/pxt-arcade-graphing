@@ -211,7 +211,7 @@ namespace display {
                 text = roundWithPrecision((i * xUnit + this.scaleXMin), 2).toString();
                 let x = i * this.gridWidth;
 
-                if (i == this.xTicks) {
+                if (i == this.gridCols) {
                     x -= this.font.charWidth * (text.length); // Move last entry on screen
                 } else {
                     x -= this.font.charWidth * (text.length) / 2;
