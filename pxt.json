@@ -3,17 +3,20 @@
     "version": "0.0.0",
     "description": "",
     "dependencies": {
-        "device": "*"
+        "device": "*",
+        "pxt-stats": "github:chasemor/pxt-stats#f4df403898b26a2cac020417b84d32dd15db6841"
     },
     "files": [
         "README.md",
         "main.ts",
         "functiontypes.ts",
         "graph.ts",
-        "data.ts"
+        "data.ts",
+        "display.ts"
     ],
     "testFiles": [
         "test.ts"
     ],
-    "public": false
+    "public": false,
+    "installedVersion": "workspace:c438cb40-ce1d-41ad-abb6-41e0841f2eee"
 }
