@@ -11,6 +11,17 @@ controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
     plot();
 })
 
+let labelX = false;
+controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
+    labelX = !labelX
+    display.setXAxisLabel(labelX ? "Tempatures" : "");
+})
+
+let labelY = false;
+controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
+    labelY = !labelY
+    display.setYAxisLabel(labelY ? "Sales" : "");
+})
 
 function plot() {
     display.graphClear();
@@ -40,6 +51,8 @@ const numOfSets = 6;
 
 function plotIceCreme() {
     display.plotSeries(datasets.temps, datasets.sales);
+    display.setXAxisLabel("Tempatures");
+    display.setYAxisLabel("Sales");
 }
 
 function plotMakeCodePop() {

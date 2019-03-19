@@ -53,6 +53,12 @@ namespace display {
         private dataSets: DataSeries[];
         private lines: GraphLines[];
 
+        private xAxisLabel: string;
+        private yAxisLabel: string;
+
+        private xLabelPadding: number;
+        private yLabelPadding: number;
+
         constructor() {
             this.font = image.font5;
             this.backgroundColor = 0xb;
@@ -61,6 +67,8 @@ namespace display {
 
             this.axisPaddingX = 22;
             this.axisPaddingY = this.font.charHeight + 4;
+            this.xLabelPadding = 0;
+            this.yLabelPadding = 0;
             this.gridRows = 2;
             this.gridCols = 2; // computed on the fly
             this.chartWidth = screen.width - this.axisPaddingX;
@@ -72,6 +80,9 @@ namespace display {
 
             this.dataSets = [];
             this.lines = []
+
+            this.xAxisLabel = "";
+            this.yAxisLabel = "";
         }
 
         public plotSeries(xValues: number[], yValues: number[], dontSort?: boolean) {
@@ -114,6 +125,7 @@ namespace display {
             this.drawLines();
             this.drawAxes();
             this.drawChartGrid();
+            this.drawLabels();
         }
 
         private calculateScale() {
@@ -156,7 +168,6 @@ namespace display {
             for (let i = 0; i <= this.gridRows; ++i)
                 xl = Math.max(roundWithPrecision(this.scaleYMax - (i * yUnit), 2).toString().length, xl);
             this.axisPaddingX = xl * this.font.charWidth + 5;
-            this.chartWidth = screen.width - this.axisPaddingX;
             this.maxEntries = (this.chartWidth - 2);
 
             // Calculate the grid for background / scale.
@@ -175,15 +186,15 @@ namespace display {
             const c = this.axisColor;
             const tipLength = 3;
 
-            screen.drawRect(this.axisPaddingX, 0, this.chartWidth + 1, this.chartHeight + 1, c);
+            screen.drawRect(this.axisPaddingX + this.yLabelPadding, 0, this.chartWidth + 1, this.chartHeight + 1, c);
 
             for (let i = 0; i < this.gridCols; i++) {
-                screen.drawLine(this.axisPaddingX + i * this.gridWidth, this.chartHeight, this.axisPaddingX + i * this.gridWidth, this.chartHeight - tipLength, c);
-                screen.drawLine(this.axisPaddingX + i * this.gridWidth, 0, this.axisPaddingX + i * this.gridWidth, tipLength, c);
+                screen.drawLine(this.yLabelPadding + this.axisPaddingX + i * this.gridWidth, this.chartHeight, this.yLabelPadding + this.axisPaddingX + i * this.gridWidth, this.chartHeight - tipLength, c);
+                screen.drawLine(this.yLabelPadding + this.axisPaddingX + i * this.gridWidth, 0, this.yLabelPadding + this.axisPaddingX + i * this.gridWidth, tipLength, c);
             }
             for (let i = 0; i < this.gridRows; i++) {
-                screen.drawLine(this.axisPaddingX + 0, i * this.gridHeight, this.axisPaddingX + tipLength, i * this.gridHeight, c);
-                screen.drawLine(this.axisPaddingX + this.chartWidth, i * this.gridHeight, this.axisPaddingX + this.chartWidth - tipLength, i * this.gridHeight, c);
+                screen.drawLine(this.axisPaddingX + this.yLabelPadding, i * this.gridHeight, this.axisPaddingX + tipLength + this.yLabelPadding, i * this.gridHeight, c);
+                screen.drawLine(this.axisPaddingX + this.chartWidth + this.yLabelPadding, i * this.gridHeight, this.axisPaddingX + this.chartWidth - tipLength + this.yLabelPadding, i * this.gridHeight, c);
             }
         }
 
@@ -204,7 +215,7 @@ namespace display {
                     y -= this.font.charHeight / 2;
                 else if (i == 0)
                     y += this.font.charHeight / 2;
-                screen.print(text, 0, y, c, this.font);
+                screen.print(text, this.yAxisLabel ? this.font.charWidth : 0, y, c, this.font);
             }
             // Draw the x-axis labels
             for (let i = 0; i <= this.gridCols; i++) {
@@ -216,7 +227,7 @@ namespace display {
                 } else {
                     x -= this.font.charWidth * (text.length) / 2;
                 }
-                screen.print(text, x + this.axisPaddingX, this.chartHeight + (this.axisPaddingY - 2 - this.font.charHeight), c, this.font);
+                screen.print(text, x + this.axisPaddingX + this.yLabelPadding, this.chartHeight + (this.axisPaddingY - 2 - this.font.charHeight), c, this.font);
             }
         }
 
@@ -234,12 +245,12 @@ namespace display {
                                 1 . 1
                                 1 1 1
                             `;
-                            if (nextX == this.axisPaddingX) {
+                            if (nextX == this.getScreenX(this.scaleXMin)) {
                                 dot.setPixel(0, 0, 0);
                                 dot.setPixel(0, 1, 0);
                                 dot.setPixel(0, 2, 0);
                             }
-                            if (nextY == this.chartHeight) {
+                            if (nextY == this.getScreenY(this.scaleYMin)) {
                                 dot.setPixel(0, 2, 0);
                                 dot.setPixel(1, 2, 0);
                                 dot.setPixel(2, 2, 0);
@@ -265,7 +276,6 @@ namespace display {
                 }
 
             }
-
         }
 
         private drawLines() {
@@ -287,22 +297,42 @@ namespace display {
                         this.axisPaddingX + this.chartWidth, this.getScreenY(intercept + slope * this.scaleXMax), this.lines[i].color);
 
                 } else {
-                    screen.drawLine(this.axisPaddingX, this.getScreenY(intercept + slope * this.scaleXMin),
+                    screen.drawLine(this.getScreenX(this.scaleXMin), this.getScreenY(intercept + slope * this.scaleXMin),
                         this.axisPaddingX + this.chartWidth, this.getScreenY(intercept + slope * this.scaleXMax), this.lines[i].color);
                 }
             }
         }
 
+        private drawLabels() {
+            let x = screen.width - (this.chartWidth / 2) - ((this.xAxisLabel.length * this.font.charWidth) / 2)
+            screen.print(this.xAxisLabel, x, screen.height - this.font.charHeight, this.axisColor, this.font);
+            const letterMargin = 1;
+            let y = (this.chartHeight / 2) - ((this.yAxisLabel.length * (this.font.charHeight + letterMargin)) / 2);
+            for (let i = 0; i < this.yAxisLabel.length; i++) {
+                screen.print(this.yAxisLabel.charAt(i), 0, y + (i * (this.font.charHeight + letterMargin)), this.axisColor, this.font);
+            }
+        }
+
         private getScreenX(x: number): number {
-            return Math.round(this.axisPaddingX + (x - this.scaleXMin) * this.xFactor);
+            return Math.round((this.axisPaddingX + this.yLabelPadding) + (x - this.scaleXMin) * this.xFactor);
         }
 
         private getScreenY(y: number): number {
             return Math.round(this.chartHeight - (y - this.scaleYMin) * this.yFactor);
         }
+
+        setXAxisLabel(label: string) {
+            this.xAxisLabel = label;
+            this.xLabelPadding = label ? this.font.charHeight : 0;
+            this.chartHeight = screen.height - this.axisPaddingY - this.xLabelPadding;
+        }
+
+        setYAxisLabel(label: string) {
+            this.yAxisLabel = label;
+            this.yLabelPadding = label ? this.font.charWidth : 0;
+            this.chartWidth = screen.width - this.axisPaddingX - this.yLabelPadding;
+        }
     }
-
-
 
     // helpers
     function log10(x: number): number {
@@ -423,6 +453,18 @@ namespace display {
             chart.render();
         }
     })
+
+    export function setXAxisLabel(label: string) {
+        if (chart) {
+            chart.setXAxisLabel(label);
+        }
+    }
+
+    export function setYAxisLabel(label: string) {
+        if (chart) {
+            chart.setYAxisLabel(label);
+        }
+    }
 
     /**
      * Clears the trend chart and the screen
