@@ -132,16 +132,16 @@ namespace display {
             // Find min and max x values
 
             if (this.dataSets.length > 0) {
-                this.scaleXMin = this.dataSets[0].dataSet.getMinX();
-                this.scaleXMax = this.dataSets[0].dataSet.getMaxX();
-                this.scaleYMin = this.dataSets[0].dataSet.getMinY();
-                this.scaleYMax = this.dataSets[0].dataSet.getMaxY();
+                this.scaleXMin = this.dataSets[0].dataSet.minX;
+                this.scaleXMax = this.dataSets[0].dataSet.maxX;
+                this.scaleYMin = this.dataSets[0].dataSet.minY;
+                this.scaleYMax = this.dataSets[0].dataSet.maxY;
 
                 for (let i = 1; i < this.dataSets.length; i++) {
-                    this.scaleXMin = Math.min(this.scaleXMin, this.dataSets[i].dataSet.getMinX());
-                    this.scaleXMax = Math.max(this.scaleXMax, this.dataSets[i].dataSet.getMaxX());
-                    this.scaleYMin = Math.min(this.scaleYMin, this.dataSets[i].dataSet.getMinY());
-                    this.scaleYMax = Math.max(this.scaleYMax, this.dataSets[i].dataSet.getMaxY());
+                    this.scaleXMin = Math.min(this.scaleXMin, this.dataSets[i].dataSet.minX);
+                    this.scaleXMax = Math.max(this.scaleXMax, this.dataSets[i].dataSet.maxX);
+                    this.scaleYMin = Math.min(this.scaleYMin, this.dataSets[i].dataSet.minY);
+                    this.scaleYMax = Math.max(this.scaleYMax, this.dataSets[i].dataSet.maxY);
                 }
             }
 
@@ -445,7 +445,7 @@ namespace display {
 
     export function graphBestFit(xValues: number[], yValues: number[]) {
         const dataSet: stats.DataSet = new stats.DataSet(xValues, yValues);
-        graphLine(dataSet.getLineOfBestFit());
+        graphLine(dataSet.lineOfBestFit);
     }
 
     game.onPaint(function () {

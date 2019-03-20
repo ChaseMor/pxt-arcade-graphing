@@ -4,7 +4,7 @@
     "description": "",
     "dependencies": {
         "device": "*",
-        "pxt-stats": "github:chasemor/pxt-stats#f4df403898b26a2cac020417b84d32dd15db6841"
+        "pxt-stats": "github:chasemor/pxt-stats"
     },
     "files": [
         "README.md",
