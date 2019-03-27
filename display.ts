@@ -71,7 +71,7 @@ namespace display {
             this.yLabelPadding = 0;
             this.gridRows = 2;
             this.gridCols = 2; // computed on the fly
-            this.chartWidth = screen.width - this.axisPaddingX;
+            this.chartWidth = screen.width - this.axisPaddingX - this.yLabelPadding;
             this.chartHeight = screen.height - this.axisPaddingY;
             this.maxEntries = (this.chartWidth - 2);
 
@@ -168,6 +168,8 @@ namespace display {
             for (let i = 0; i <= this.gridRows; ++i)
                 xl = Math.max(roundWithPrecision(this.scaleYMax - (i * yUnit), 2).toString().length, xl);
             this.axisPaddingX = xl * this.font.charWidth + 5;
+            
+            this.chartWidth = screen.width - this.axisPaddingX - this.yLabelPadding;
             this.maxEntries = (this.chartWidth - 2);
 
             // Calculate the grid for background / scale.
@@ -185,7 +187,7 @@ namespace display {
         private drawChartGrid() {
             const c = this.axisColor;
             const tipLength = 3;
-
+            
             screen.drawRect(this.axisPaddingX + this.yLabelPadding, 0, this.chartWidth + 1, this.chartHeight + 1, c);
 
             for (let i = 0; i < this.gridCols; i++) {
