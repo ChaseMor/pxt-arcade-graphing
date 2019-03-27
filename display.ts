@@ -427,18 +427,35 @@ namespace display {
 
     let chart: Chart;
 
+    /**
+     * Plots the given series as a scatter-plot
+     * 
+     * @param xValues The x values of the series
+     * @param yValues The y values of the series
+     */
     export function plotSeries(xValues: number[], yValues: number[]) {
         if (!chart)
             chart = new Chart();
         chart.plotSeries(xValues, yValues);
     }
 
+    /**
+     * Plots the given series as a line-graph
+     * 
+     * @param xValues The x values of the series
+     * @param yValues The y values of the series
+     */
     export function graphSeries(xValues: number[], yValues: number[]) {
         if (!chart)
             chart = new Chart();
         chart.graphSeries(xValues, yValues);
     }
 
+    /**
+     * Graphs a line with the given coefficients
+     * 
+     * @param coeff The coefficients of the line in the form [slope, y-intercept]
+     */
     export function graphLine(coeff: number[]) {
         if (!coeff || coeff.length == 0) {
             return;
@@ -448,6 +465,12 @@ namespace display {
         chart.graphLine(coeff);
     }
 
+    /**
+     * Graphs the line of best fit for the given series
+     * 
+     * @param xValues The x values of the series
+     * @param yValues The y values of the series
+     */
     export function graphBestFit(xValues: number[], yValues: number[]) {
         const dataSet: stats.DataSet = new stats.DataSet(xValues, yValues);
         graphLine(dataSet.lineOfBestFit);
@@ -459,12 +482,22 @@ namespace display {
         }
     })
 
+    /**
+     * Sets the label for the x-axis. Removes axis label if given label is empty or undefined
+     * 
+     * @param label The label for the x-axis
+     */
     export function setXAxisLabel(label: string) {
         if (chart) {
             chart.setXAxisLabel(label);
         }
     }
 
+    /**
+     * Sets the label for the y-axis. Removes axis label if given label is empty or undefined
+     * 
+     * @param label The label for the y-axis
+     */
     export function setYAxisLabel(label: string) {
         if (chart) {
             chart.setYAxisLabel(label);
