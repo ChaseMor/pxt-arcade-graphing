@@ -10,11 +10,20 @@ namespace display {
         dataSet: stats.DataSet;
         kind: PlotType;
         color: number;
+        bounds?: GraphBounds;
     }
 
     interface GraphLines {
         coeff: number[];
         color: number;
+        bounds?: GraphBounds;
+    }
+
+    interface GraphBounds {
+        minX?: number;
+        maxX?: number;
+        minY?: number;
+        maxY?: number;
     }
 
     class Chart {
@@ -94,7 +103,13 @@ namespace display {
             this.dataSets.push({
                 dataSet: data,
                 kind: PlotType.Scatter,
-                color: this.plotColors[(this.dataSets.length + this.lines.length) % this.plotColors.length]
+                color: this.plotColors[(this.dataSets.length + this.lines.length) % this.plotColors.length],
+                bounds: {
+                    minX: data.minX,
+                    maxX: data.maxX,
+                    minY: data.minY,
+                    maxY: data.maxY,
+                }
             });
         }
 
@@ -106,14 +121,21 @@ namespace display {
             this.dataSets.push({
                 dataSet: data,
                 kind: PlotType.Line,
-                color: this.plotColors[(this.dataSets.length + this.lines.length) % this.plotColors.length]
+                color: this.plotColors[(this.dataSets.length + this.lines.length) % this.plotColors.length],
+                bounds: {
+                    minX: data.minX,
+                    maxX: data.maxX,
+                    minY: data.minY,
+                    maxY: data.maxY,
+                }
             });
         }
 
-        public graphLine(coeff: number[]) {
+        public graphLine(coeff: number[], bounds: GraphBounds) {
             this.lines.push({
                 coeff: coeff,
-                color: this.plotColors[(this.dataSets.length + this.lines.length) % this.plotColors.length]
+                color: this.plotColors[(this.dataSets.length + this.lines.length) % this.plotColors.length],
+                bounds: bounds
             });
         }
 
@@ -129,19 +151,38 @@ namespace display {
         }
 
         private calculateScale() {
-            // Find min and max x values
+            // Find min and max x and y values
 
-            if (this.dataSets.length > 0) {
-                this.scaleXMin = this.dataSets[0].dataSet.minX;
-                this.scaleXMax = this.dataSets[0].dataSet.maxX;
-                this.scaleYMin = this.dataSets[0].dataSet.minY;
-                this.scaleYMax = this.dataSets[0].dataSet.maxY;
-
-                for (let i = 1; i < this.dataSets.length; i++) {
+            // If bounds of a dataset are set use those, otherwise use min max values
+            for (let i = 0; i < this.dataSets.length; i++) {
+                if (this.dataSets[i].bounds && this.dataSets[i].bounds.minX != undefined) {
+                    this.scaleXMin = Math.min(this.scaleXMin, this.dataSets[i].bounds.minX);
+                } else {
                     this.scaleXMin = Math.min(this.scaleXMin, this.dataSets[i].dataSet.minX);
+                }
+                if (this.dataSets[i].bounds && this.dataSets[i].bounds.maxX != undefined) {
+                    this.scaleXMax = Math.max(this.scaleXMax, this.dataSets[i].bounds.maxX);
+                } else {
                     this.scaleXMax = Math.max(this.scaleXMax, this.dataSets[i].dataSet.maxX);
+                }
+                if (this.dataSets[i].bounds && this.dataSets[i].bounds.minY != undefined) {
+                    this.scaleYMin = Math.min(this.scaleYMin, this.dataSets[i].bounds.minY);
+                } else {
                     this.scaleYMin = Math.min(this.scaleYMin, this.dataSets[i].dataSet.minY);
+                }
+                if (this.dataSets[i].bounds && this.dataSets[i].bounds.maxY != undefined) {
+                    this.scaleYMax = Math.max(this.scaleYMax, this.dataSets[i].bounds.maxY);
+                } else {
                     this.scaleYMax = Math.max(this.scaleYMax, this.dataSets[i].dataSet.maxY);
+                }
+            }
+
+            for (let i = 0; i < this.lines.length; i++) {
+                if (this.lines[i].bounds) {
+                    this.scaleXMin = Math.min(this.scaleXMin, this.lines[i].bounds.minX);    
+                    this.scaleXMax = Math.max(this.scaleXMax, this.lines[i].bounds.maxX);    
+                    this.scaleYMin = Math.min(this.scaleYMin, this.lines[i].bounds.minY);    
+                    this.scaleYMax = Math.max(this.scaleYMax, this.lines[i].bounds.maxY);   
                 }
             }
 
@@ -281,10 +322,6 @@ namespace display {
         }
 
         private drawLines() {
-            if (this.dataSets.length == 0) {
-                // no bounds have been set
-                return;
-            }
             for (let i = 0; i < this.lines.length; i++) {
                 let coeff = this.lines[i].coeff;
                 // TODO add support for quadratics and beyond
@@ -455,14 +492,15 @@ namespace display {
      * Graphs a line with the given coefficients
      * 
      * @param coeff The coefficients of the line in the form [slope, y-intercept]
+     * @param bounds The bounds of the line
      */
-    export function graphLine(coeff: number[]) {
+    export function graphLine(coeff: number[], bounds?: GraphBounds) {
         if (!coeff || coeff.length == 0) {
             return;
         }
         if (!chart)
             chart = new Chart();
-        chart.graphLine(coeff);
+        chart.graphLine(coeff, bounds);
     }
 
     /**
@@ -473,7 +511,13 @@ namespace display {
      */
     export function graphBestFit(xValues: number[], yValues: number[]) {
         const dataSet: stats.DataSet = new stats.DataSet(xValues, yValues);
-        graphLine(dataSet.lineOfBestFit);
+        graphLine(dataSet.lineOfBestFit,
+            {
+                minX: dataSet.minX,
+                maxX: dataSet.maxX,
+                minY: dataSet.minY,
+                maxY: dataSet.maxY,
+            });
     }
 
     game.onPaint(function () {
