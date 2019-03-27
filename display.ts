@@ -295,7 +295,10 @@ namespace display {
                     let xIntercept = (this.scaleYMin - intercept) / slope;
                     screen.drawLine(this.getScreenX(xIntercept), this.getScreenY(intercept + slope * xIntercept),
                         this.axisPaddingX + this.chartWidth, this.getScreenY(intercept + slope * this.scaleXMax), this.lines[i].color);
-
+                } else if (intercept + slope * this.scaleXMax < this.scaleYMin) {
+                    let xIntercept = (this.scaleYMin - intercept) / slope;
+                    screen.drawLine(this.getScreenX(this.scaleXMin), this.getScreenY(intercept + slope * this.scaleXMin),
+                        this.getScreenX(xIntercept), this.getScreenY(intercept + slope * xIntercept), this.lines[i].color);
                 } else {
                     screen.drawLine(this.getScreenX(this.scaleXMin), this.getScreenY(intercept + slope * this.scaleXMin),
                         this.axisPaddingX + this.chartWidth, this.getScreenY(intercept + slope * this.scaleXMax), this.lines[i].color);
