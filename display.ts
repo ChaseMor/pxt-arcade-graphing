@@ -1,8 +1,8 @@
-namespace display {
+namespace graph {
 
     enum PlotType {
         Scatter,
-        Line,
+        Line
     }
 
     interface DataSeries {
