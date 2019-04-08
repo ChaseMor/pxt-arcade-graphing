@@ -581,8 +581,6 @@ namespace graph {
     /**
      * Clears the trend chart and the screen
      */
-    //% group="Charts"
-    //% blockid=graphclear block="graph clear"
     export function graphClear() {
         chart = undefined;
         screen.fill(0);
