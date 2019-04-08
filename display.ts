@@ -72,7 +72,21 @@ namespace display {
             this.font = image.font5;
             this.backgroundColor = 0xb;
             this.axisColor = 0xf;
-            this.plotColors = [0x8, 0x2, 0x7, 0x4, 0xa, 0x5, 0x1, 0x3, 0x6, 0xf, 0x9, 0xc, 0xd, 0xe];
+            this.plotColors = [0x8,
+                0x2,
+                0x7,
+                0x4,
+                0xa,
+                0x5,
+                0x1,
+                0x3,
+                0x6,
+                0xf,
+                0x9,
+                0xc,
+                0xd,
+                0xe
+            ];
 
             this.axisPaddingX = 22;
             this.axisPaddingY = this.font.charHeight + 4;
@@ -103,7 +117,8 @@ namespace display {
             this.dataSets.push({
                 dataSet: data,
                 kind: PlotType.Scatter,
-                color: this.plotColors[(this.dataSets.length + this.lines.length) % this.plotColors.length],
+                color: this.plotColors[(this.dataSets.length + this.lines.length)
+                    % this.plotColors.length],
                 bounds: {
                     minX: data.minX,
                     maxX: data.maxX,
@@ -121,7 +136,8 @@ namespace display {
             this.dataSets.push({
                 dataSet: data,
                 kind: PlotType.Line,
-                color: this.plotColors[(this.dataSets.length + this.lines.length) % this.plotColors.length],
+                color: this.plotColors[(this.dataSets.length + this.lines.length)
+                    % this.plotColors.length],
                 bounds: {
                     minX: data.minX,
                     maxX: data.maxX,
@@ -134,7 +150,8 @@ namespace display {
         public graphLine(coeff: number[], bounds: GraphBounds) {
             this.lines.push({
                 coeff: coeff,
-                color: this.plotColors[(this.dataSets.length + this.lines.length) % this.plotColors.length],
+                color: this.plotColors[(this.dataSets.length + this.lines.length)
+                    % this.plotColors.length],
                 bounds: bounds
             });
         }
@@ -179,10 +196,10 @@ namespace display {
 
             for (let i = 0; i < this.lines.length; i++) {
                 if (this.lines[i].bounds) {
-                    this.scaleXMin = Math.min(this.scaleXMin, this.lines[i].bounds.minX);    
-                    this.scaleXMax = Math.max(this.scaleXMax, this.lines[i].bounds.maxX);    
-                    this.scaleYMin = Math.min(this.scaleYMin, this.lines[i].bounds.minY);    
-                    this.scaleYMax = Math.max(this.scaleYMax, this.lines[i].bounds.maxY);   
+                    this.scaleXMin = Math.min(this.scaleXMin, this.lines[i].bounds.minX);
+                    this.scaleXMax = Math.max(this.scaleXMax, this.lines[i].bounds.maxX);
+                    this.scaleYMin = Math.min(this.scaleYMin, this.lines[i].bounds.minY);
+                    this.scaleYMax = Math.max(this.scaleYMax, this.lines[i].bounds.maxY);
                 }
             }
 
@@ -209,7 +226,7 @@ namespace display {
             for (let i = 0; i <= this.gridRows; ++i)
                 xl = Math.max(roundWithPrecision(this.scaleYMax - (i * yUnit), 2).toString().length, xl);
             this.axisPaddingX = xl * this.font.charWidth + 5;
-            
+
             this.chartWidth = screen.width - this.axisPaddingX - this.yLabelPadding;
             this.maxEntries = (this.chartWidth - 2);
 
@@ -228,7 +245,7 @@ namespace display {
         private drawChartGrid() {
             const c = this.axisColor;
             const tipLength = 3;
-            
+
             screen.drawRect(this.axisPaddingX + this.yLabelPadding, 0, this.chartWidth + 1, this.chartHeight + 1, c);
 
             for (let i = 0; i < this.gridCols; i++) {
@@ -270,7 +287,11 @@ namespace display {
                 } else {
                     x -= this.font.charWidth * (text.length) / 2;
                 }
-                screen.print(text, x + this.axisPaddingX + this.yLabelPadding, this.chartHeight + (this.axisPaddingY - 2 - this.font.charHeight), c, this.font);
+                screen.print(text,
+                    x + this.axisPaddingX + this.yLabelPadding,
+                    this.chartHeight + (this.axisPaddingY - 2 - this.font.charHeight),
+                    c,
+                    this.font);
             }
         }
 
@@ -317,7 +338,6 @@ namespace display {
                         }
                         break;
                 }
-
             }
         }
 
@@ -332,15 +352,24 @@ namespace display {
                 let slope: number = coeff.length > 1 ? coeff[coeff.length - 2] : 0;
                 if (intercept + slope * this.scaleXMin < this.scaleYMin) {
                     let xIntercept = (this.scaleYMin - intercept) / slope;
-                    screen.drawLine(this.getScreenX(xIntercept), this.getScreenY(intercept + slope * xIntercept),
-                        this.getScreenX(this.scaleXMax), this.getScreenY(intercept + slope * this.scaleXMax), this.lines[i].color);
+                    screen.drawLine(this.getScreenX(xIntercept),
+                        this.getScreenY(intercept + slope * xIntercept),
+                        this.getScreenX(this.scaleXMax),
+                        this.getScreenY(intercept + slope * this.scaleXMax),
+                        this.lines[i].color);
                 } else if (intercept + slope * this.scaleXMax < this.scaleYMin) {
                     let xIntercept = (this.scaleYMin - intercept) / slope;
-                    screen.drawLine(this.getScreenX(this.scaleXMin), this.getScreenY(intercept + slope * this.scaleXMin),
-                        this.getScreenX(xIntercept), this.getScreenY(intercept + slope * xIntercept), this.lines[i].color);
+                    screen.drawLine(this.getScreenX(this.scaleXMin),
+                        this.getScreenY(intercept + slope * this.scaleXMin),
+                        this.getScreenX(xIntercept),
+                        this.getScreenY(intercept + slope * xIntercept),
+                        this.lines[i].color);
                 } else {
-                    screen.drawLine(this.getScreenX(this.scaleXMin), this.getScreenY(intercept + slope * this.scaleXMin),
-                        this.getScreenX(this.scaleXMax), this.getScreenY(intercept + slope * this.scaleXMax), this.lines[i].color);
+                    screen.drawLine(this.getScreenX(this.scaleXMin),
+                        this.getScreenY(intercept + slope * this.scaleXMin),
+                        this.getScreenX(this.scaleXMax),
+                        this.getScreenY(intercept + slope * this.scaleXMax),
+                        this.lines[i].color);
                 }
             }
         }
@@ -351,7 +380,11 @@ namespace display {
             const letterMargin = 1;
             let y = (this.chartHeight / 2) - ((this.yAxisLabel.length * (this.font.charHeight + letterMargin)) / 2);
             for (let i = 0; i < this.yAxisLabel.length; i++) {
-                screen.print(this.yAxisLabel.charAt(i), 0, y + (i * (this.font.charHeight + letterMargin)), this.axisColor, this.font);
+                screen.print(this.yAxisLabel.charAt(i),
+                    0,
+                    y + (i * (this.font.charHeight + letterMargin)),
+                    this.axisColor,
+                    this.font);
             }
         }
 
@@ -423,7 +456,6 @@ namespace display {
             currentBase = bases[k];
             n = 4; // This value only allows results smaller than about 1000 = 10^n
 
-
             do // Tick vector length reduction
             {
                 --n;
@@ -461,13 +493,12 @@ namespace display {
         return [start, end, nMaxIntervals];
     }
 
-
     let chart: Chart;
 
     /**
      * Plots the given series as a scatter-plot
-     * 
-     * @param xValues The x values of the series
+     *
+     *      * @param xValues The x values of the series
      * @param yValues The y values of the series
      */
     export function plotSeries(xValues: number[], yValues: number[]) {
@@ -478,8 +509,8 @@ namespace display {
 
     /**
      * Plots the given series as a line-graph
-     * 
-     * @param xValues The x values of the series
+     *
+     *      * @param xValues The x values of the series
      * @param yValues The y values of the series
      */
     export function graphSeries(xValues: number[], yValues: number[]) {
@@ -490,8 +521,8 @@ namespace display {
 
     /**
      * Graphs a line with the given coefficients
-     * 
-     * @param coeff The coefficients of the line in the form [slope, y-intercept]
+     *
+     *      * @param coeff The coefficients of the line in the form [slope, y-intercept]
      * @param bounds The bounds of the line
      */
     export function graphLine(coeff: number[], bounds?: GraphBounds) {
@@ -505,8 +536,8 @@ namespace display {
 
     /**
      * Graphs the line of best fit for the given series
-     * 
-     * @param xValues The x values of the series
+     *
+     *      * @param xValues The x values of the series
      * @param yValues The y values of the series
      */
     export function graphBestFit(xValues: number[], yValues: number[]) {
@@ -528,8 +559,8 @@ namespace display {
 
     /**
      * Sets the label for the x-axis. Removes axis label if given label is empty or undefined
-     * 
-     * @param label The label for the x-axis
+     *
+     *      * @param label The label for the x-axis
      */
     export function setXAxisLabel(label: string) {
         if (chart) {
@@ -539,8 +570,8 @@ namespace display {
 
     /**
      * Sets the label for the y-axis. Removes axis label if given label is empty or undefined
-     * 
-     * @param label The label for the y-axis
+     *
+     *      * @param label The label for the y-axis
      */
     export function setYAxisLabel(label: string) {
         if (chart) {
