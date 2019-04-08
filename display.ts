@@ -3,7 +3,6 @@ namespace display {
     enum PlotType {
         Scatter,
         Line,
-        Histogram
     }
 
     interface DataSeries {
